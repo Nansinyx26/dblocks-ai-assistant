@@ -10,7 +10,7 @@ const voiceBtn = document.getElementById('voice-btn');
 
 // --- Configuração ElevenLabs ---
 // Chave oficial fornecida pelo usuário
-const ELEVENLABS_API_KEY = "sk_7eb3d116cc06f13f3e07d9a5544d732471003b30a41469c3";
+const ELEVENLABS_API_KEY = "sk_bfec900de230605fa5c14611ae86e83b943d3138a23a9409";
 const API_KEY = ELEVENLABS_API_KEY.trim();
 
 console.log(`[ElevenLabs] Chave Inicializada. Comprimento: ${API_KEY.length}`);
@@ -242,6 +242,13 @@ function setLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('selected_lang', currentLang);
     updateLanguageUI();
+
+    // Atualizar idioma do reconhecimento de voz
+    if (recognition) {
+        recognition.lang = currentLang === 'pt' ? 'pt-BR' : 'en-US';
+        console.log(`[STT] Idioma de reconhecimento alterado para: ${recognition.lang}`);
+    }
+
     const confirm = lang === 'pt' ? "Idioma alterado para Português." : "Language changed to English.";
     speak(confirm);
 }
@@ -512,8 +519,10 @@ function startRecording() {
 
     try {
         if (recognition) {
+            // Atualizar idioma antes de iniciar para garantir sincronização
+            recognition.lang = currentLang === 'pt' ? 'pt-BR' : 'en-US';
             recognition.start();
-            console.log("Iniciando captura de voz...");
+            console.log(`Iniciando captura de voz em ${recognition.lang}...`);
         } else {
             alert("Seu navegador não suporta reconhecimento de voz.");
             stopRecording();

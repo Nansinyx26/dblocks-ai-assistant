@@ -17,12 +17,18 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
+    /* Performance: desabilitar highlight de toque */
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     background: #000810;
     overflow: hidden;
     height: 100vh;
+    /* Performance: otimizar renderização de texto */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
 }
 
 /* Mock Background */
@@ -187,13 +193,18 @@ body {
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0, 136, 204, 0.5);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Performance: usar apenas transform para animação */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     z-index: 1001;
+    /* GPU acceleration */
+    transform: translateZ(0);
+    will-change: transform;
+    contain: layout style;
 }
 
 .launcher-btn:hover {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.1) rotate(5deg) translateZ(0);
 }
 
 .pulse-ring {
@@ -205,16 +216,19 @@ body {
     opacity: 0.6;
     animation: pulse 2s infinite;
     z-index: -1;
+    /* GPU acceleration */
+    transform: translateZ(0);
+    will-change: transform, opacity;
 }
 
 @keyframes pulse {
     0% {
-        transform: scale(1);
+        transform: scale(1) translateZ(0);
         opacity: 0.6;
     }
 
     100% {
-        transform: scale(1.7);
+        transform: scale(1.7) translateZ(0);
         opacity: 0;
     }
 }
@@ -227,24 +241,28 @@ body {
     width: 380px;
     height: 600px;
     background: rgba(0, 15, 30, 0.98);
-    backdrop-filter: blur(30px);
+    /* Performance: backdrop-filter apenas em desktop */
+    backdrop-filter: blur(15px);
     border: 1.5px solid var(--glass-border);
     border-radius: 28px;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    /* Importante para esconder o painel lateral */
     transform-origin: bottom right;
-    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    /* Performance: transição apenas em opacity e transform */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
     opacity: 0;
-    transform: scale(0.9) translateY(40px);
+    transform: scale(0.9) translateY(40px) translateZ(0);
     pointer-events: none;
+    /* GPU layer */
+    will-change: transform, opacity;
+    contain: layout style paint;
 }
 
 .assistant-expanded .assistant-content {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1) translateY(0) translateZ(0);
     pointer-events: all;
 }
 
@@ -344,15 +362,17 @@ body {
     width: 220px;
     padding: 10px 0;
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-10px) translateZ(0);
     pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Performance: transição leve */
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
     z-index: 3000;
+    will-change: transform, opacity;
 }
 
 .voice-menu.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) translateZ(0);
     pointer-events: all;
 }
 
@@ -384,8 +404,13 @@ body {
     flex-direction: column;
     gap: 15px;
     background: rgba(0, 0, 0, 0.1);
-    scroll-behavior: smooth;
+    /* Performance: scroll otimizado */
+    scroll-behavior: auto;
+    /* smooth é pesado em mobile */
+    -webkit-overflow-scrolling: touch;
     position: relative;
+    contain: content;
+    transform: translateZ(0);
 }
 
 .message {
@@ -455,25 +480,27 @@ body {
     margin-left: 8px;
     cursor: pointer;
     font-size: 16px;
-    transition: all 0.3s ease;
+    /* Performance: transição apenas em transform */
+    transition: transform 0.2s ease;
     display: inline-block;
+    transform: translateZ(0);
 }
 
 .playback-cue.playing {
     color: var(--accent-blue) !important;
+    /* Performance: animação simplificada sem filter */
     animation: neon-pulse-audio 0.6s infinite alternate;
-    filter: drop-shadow(0 0 8px var(--accent-blue));
 }
 
 @keyframes neon-pulse-audio {
     from {
-        transform: scale(1);
-        filter: drop-shadow(0 0 2px var(--accent-blue));
+        transform: scale(1) translateZ(0);
+        opacity: 1;
     }
 
     to {
-        transform: scale(1.4);
-        filter: drop-shadow(0 0 15px var(--accent-blue));
+        transform: scale(1.3) translateZ(0);
+        opacity: 0.8;
     }
 }
 
@@ -507,15 +534,17 @@ body {
     height: 100%;
     background: var(--primary-dark);
     z-index: 3500;
-    transform: translateX(100%);
-    /* Deslizar lateralmente para ser mais "aba" */
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(100%) translateZ(0);
+    /* Performance: transição leve */
+    transition: transform 0.3s ease-out;
     display: flex;
     flex-direction: column;
+    will-change: transform;
+    contain: layout style paint;
 }
 
 .info-panel.show {
-    transform: translateX(0);
+    transform: translateX(0) translateZ(0);
 }
 
 .info-panel-header {
@@ -677,6 +706,7 @@ input#user-input {
     align-items: center;
     gap: 3px;
     height: 18px;
+    transform: translateZ(0);
 }
 
 .wave-bar {
@@ -685,6 +715,9 @@ input#user-input {
     background: #ff3b30;
     border-radius: 2px;
     animation: wave-play 1.2s infinite ease-in-out;
+    /* GPU acceleration */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .wave-bar:nth-child(2) {
@@ -706,11 +739,11 @@ input#user-input {
 
     0%,
     100% {
-        transform: scaleY(1);
+        transform: scaleY(1) translateZ(0);
     }
 
     50% {
-        transform: scaleY(1.5);
+        transform: scaleY(1.5) translateZ(0);
     }
 }
 
@@ -791,20 +824,39 @@ input#user-input {
         border-radius: 0;
         border: none;
         transform-origin: bottom center;
-        background: rgba(0, 8, 16, 1);
+        /* Performance: fundo sólido em mobile (sem backdrop-filter) */
+        background: rgb(0, 8, 16);
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
         display: flex;
         flex-direction: column;
-    }
-
-    /* Adjust animation for fullscreen */
-    .assistant-content {
-        transform: translateY(100%);
-        opacity: 0;
+        /* GPU acceleration */
+        transform: translateY(100%) translateZ(0);
+        will-change: transform, opacity;
     }
 
     .assistant-expanded .assistant-content {
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
         opacity: 1;
+    }
+
+    /* Performance: otimizar scroll no mobile */
+    .chat-messages {
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        overscroll-behavior: contain;
+    }
+
+    /* Performance: desabilitar backdrop-filter pesado em bubbles */
+    .message.bot .bubble {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(30, 40, 60, 0.95);
+    }
+
+    /* Performance: animações simplificadas */
+    .pulse-ring {
+        animation: pulse 2.5s infinite;
     }
 
     /* Adjust Header for Mobile */

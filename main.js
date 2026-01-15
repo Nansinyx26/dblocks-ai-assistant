@@ -10,7 +10,7 @@ const voiceBtn = document.getElementById('voice-btn');
 
 // --- Configuração ElevenLabs ---
 // Chave oficial fornecida pelo usuário
-const ELEVENLABS_API_KEY = "076469d0493b6e66c58d4efa73d3fcf440d813bcc78767e5d3e17e5ee6daeefe";
+const ELEVENLABS_API_KEY = "sk_7eb3d116cc06f13f3e07d9a5544d732471003b30a41469c3";
 const API_KEY = ELEVENLABS_API_KEY.trim();
 
 console.log(`[ElevenLabs] Chave Inicializada. Comprimento: ${API_KEY.length}`);
@@ -31,9 +31,18 @@ if (!VOICE_ID || !availableVoices.some(v => v.id === VOICE_ID)) {
 
 // --- IndexedDB ---
 const DB_NAME = 'DblocksChatDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Atualizado para incluir store de créditos
 const STORE_NAME = 'messages';
+const CREDITS_STORE = 'credits';
 let db;
+
+// Dados iniciais de créditos (configuráveis)
+const DEFAULT_CREDITS = {
+    limit: 10000,
+    used: 4500, // 45% usado conforme site ElevenLabs
+    resetDay: 15, // Dia do mês que reseta
+    lastReset: new Date().toISOString()
+};
 
 function initDB() {
     return new Promise((resolve, reject) => {
@@ -41,17 +50,81 @@ function initDB() {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
+                // Store de mensagens
                 if (!db.objectStoreNames.contains(STORE_NAME)) {
                     db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                }
+                // Store de créditos
+                if (!db.objectStoreNames.contains(CREDITS_STORE)) {
+                    const creditsStore = db.createObjectStore(CREDITS_STORE, { keyPath: 'id' });
+                    // Inicializar com valores padrão
                 }
             };
             request.onsuccess = (e) => {
                 db = e.target.result;
+                initCredits(); // Inicializar créditos
                 resolve(db);
             };
             request.onerror = (e) => reject(e.target.error);
         } catch (err) { reject(err); }
     });
+}
+
+// --- Funções de Créditos ---
+async function initCredits() {
+    const credits = await getCredits();
+    if (!credits) {
+        await saveCredits(DEFAULT_CREDITS);
+    } else {
+        // Verificar reset automático
+        checkAutoReset(credits);
+    }
+}
+
+async function getCredits() {
+    if (!db) return null;
+    return new Promise((resolve) => {
+        try {
+            const transaction = db.transaction([CREDITS_STORE], 'readonly');
+            const store = transaction.objectStore(CREDITS_STORE);
+            const request = store.get('quota');
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => resolve(null);
+        } catch (e) { resolve(null); }
+    });
+}
+
+async function saveCredits(data) {
+    if (!db) return;
+    try {
+        const transaction = db.transaction([CREDITS_STORE], 'readwrite');
+        const store = transaction.objectStore(CREDITS_STORE);
+        store.put({ id: 'quota', ...data });
+    } catch (e) { console.warn("Erro ao salvar créditos:", e); }
+}
+
+async function subtractCredits(characters) {
+    const credits = await getCredits();
+    if (credits) {
+        credits.used = Math.min(credits.limit, (credits.used || 0) + characters);
+        await saveCredits(credits);
+        console.log(`[Créditos] Gastou ${characters} caracteres. Total usado: ${credits.used}/${credits.limit}`);
+    }
+}
+
+function checkAutoReset(credits) {
+    const today = new Date();
+    const lastReset = new Date(credits.lastReset || new Date());
+
+    // Se passou de um mês e estamos no dia de reset ou depois
+    if (today.getDate() >= credits.resetDay &&
+        (today.getMonth() !== lastReset.getMonth() || today.getFullYear() !== lastReset.getFullYear())) {
+        // Reset!
+        credits.used = 0;
+        credits.lastReset = today.toISOString();
+        saveCredits(credits);
+        console.log("[Créditos] Reset automático realizado!");
+    }
 }
 
 async function saveMessageToDB(text, sender) {
@@ -141,6 +214,7 @@ if (infoBtn && infoModal) {
     infoBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         infoModal.classList.add('show');
+        fetchQuotaElevenLabs(); // Buscar saldo ao abrir
     });
 }
 
@@ -476,6 +550,7 @@ async function speak(text) {
 
         if (response.ok) {
             console.log("ElevenLabs: Resposta OK, reproduzindo áudio...");
+
             const audioBlob = await response.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
@@ -507,4 +582,43 @@ async function speak(text) {
         console.error("Falha na requisição ElevenLabs:", e);
         alert("Falha na requisição para ElevenLabs. Verifique sua conexão.");
     }
+}
+
+
+// --- Consultar Saldo de Créditos (Aviso Estático) ---
+
+function fetchQuotaElevenLabs() {
+    const quotaDisplay = document.getElementById('quota-display');
+    if (!quotaDisplay) return;
+
+    // Calcular próxima data de reset (Dia 15)
+    const today = new Date();
+    let nextReset = new Date(today.getFullYear(), today.getMonth(), 15);
+
+    // Se hoje já passou do dia 15, o próximo é no mês seguinte
+    if (today.getDate() >= 15) {
+        nextReset.setMonth(nextReset.getMonth() + 1);
+    }
+
+    const resetDate = nextReset.toLocaleDateString('pt-BR');
+
+    quotaDisplay.innerHTML = `
+        <div style="background: rgba(0, 163, 255, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--accent-blue);">
+            <div style="display: flex; align-items: start; gap: 10px;">
+                <i class="bi bi-info-circle-fill" style="color: var(--accent-blue); font-size: 18px; margin-top: 2px;"></i>
+                <div>
+                    <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #fff;">Limite de Áudio Mensal</h4>
+                    <p style="margin: 0; font-size: 12px; color: #ccc; line-height: 1.4;">
+                        Este assistente usa uma cota gratuita de voz. 
+                        <strong>Se o áudio parar de funcionar</strong>, significa que o limite do mês foi atingido.
+                    </p>
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <p style="margin: 0; font-size: 12px; color: #888;">
+                            <i class="bi bi-calendar-check"></i> Próxima renovação: <strong style="color: var(--accent-green);">${resetDate}</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }

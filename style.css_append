@@ -1,0 +1,140 @@
+/* --- Responsive Design --- */
+
+/* Tablet & Mobile adjustments */
+@media (max-width: 1024px) {
+    .dev-info-container {
+        width: 85%;
+        top: 40%;
+    }
+
+    .assistant-content {
+        right: 20px;
+        bottom: 85px;
+    }
+
+    #voice-assistant {
+        right: 20px;
+        bottom: 20px;
+    }
+}
+
+/* Tablet (Portrait) & Large Mobile */
+@media (max-width: 768px) {
+    .dev-info-container {
+        width: 90%;
+        top: 35%;
+    }
+
+    .dev-info-card {
+        padding: 25px;
+    }
+
+    .dev-info-card h2 {
+        font-size: 1.4rem;
+    }
+
+    .dev-alert {
+        padding: 15px;
+        font-size: 14px;
+    }
+
+    /* Adjust assistant size */
+    .assistant-content {
+        width: 350px;
+        height: 550px;
+    }
+}
+
+/* Mobile Devices */
+@media (max-width: 480px) {
+    .logo-placeholder {
+        height: 40px;
+        margin-bottom: 15px;
+    }
+    
+    .canvas-placeholder {
+        height: calc(100% - 50px);
+    }
+
+    .dev-info-container {
+        top: 50%;
+        width: 95%;
+        padding: 0 10px;
+    }
+
+    .dev-info-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .dev-info-card h2 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .dev-alert {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        align-items: center;
+    }
+
+    /* Assistant Widget - Full Screen on Mobile */
+    #voice-assistant {
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .launcher-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+
+    .assistant-content {
+        position: fixed;
+        bottom: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none;
+        max-height: none;
+        border-radius: 0;
+        border: none;
+        transform-origin: center bottom;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .assistant-header {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-messages {
+        padding: 15px;
+    }
+
+    .voice-menu {
+        position: fixed;
+        top: 60px; /* Below header */
+        right: 10px;
+        width: auto;
+        min-width: 200px;
+    }
+
+    .assistant-footer {
+        padding: 10px 15px;
+        padding-bottom: 20px; /* Safe area for swipe bar */
+    }
+
+    #user-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    /* Info Panel on Mobile */
+    .info-panel {
+        z-index: 4000;
+    }
+}

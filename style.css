@@ -757,4 +757,87 @@ input#user-input {
 
 .verify-btn:active {
     transform: scale(0.95);
+}/* --- Mobile Responsiveness (Xiaomi Note 12 and others) --- */
+@media screen and (max-width: 768px) {
+
+    /* Reposition Launcher to Bottom Right comfortably */
+    #voice-assistant {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    /* Assistant Content: Full Screen on Mobile */
+    .assistant-content {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 100vw;
+        height: 100vh;
+        /* Fullscreen logic */
+        max-height: 100vh;
+        border-radius: 0;
+        border: none;
+        transform-origin: bottom center;
+        background: rgba(0, 8, 16, 0.98);
+        /* Slightly darker for better readability */
+    }
+
+    /* Adjust animation for fullscreen */
+    .assistant-content {
+        transform: scale(0.9) translateY(100%);
+        /* Slide up from bottom */
+    }
+
+    .assistant-expanded .assistant-content {
+        transform: scale(1) translateY(0);
+    }
+
+    /* Adjust Header for Mobile */
+    .assistant-header {
+        padding: 15px;
+        padding-top: max(15px, env(safe-area-inset-top));
+        /* Notch support */
+    }
+
+    /* Hide Launcher check when expanded (optional, but cleaner) */
+    .assistant-expanded .launcher-btn {
+        display: none;
+    }
+
+    /* Chat Messages - Adjust padding */
+    .chat-messages {
+        padding: 15px;
+        padding-bottom: 80px;
+        /* Space for footer */
+    }
+
+    /* Footer - Fixed at bottom */
+    .assistant-footer {
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+        background: rgba(0, 20, 40, 1);
+    }
+
+    /* Increase touch targets */
+    #close-chat,
+    #voice-selector-btn,
+    #info-btn,
+    .lang-btn,
+    #send-btn {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* Adjust Voice Menu position */
+    .voice-menu {
+        position: fixed;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .voice-menu.show {
+        transform: translateX(-50%) translateY(0);
+    }
 }

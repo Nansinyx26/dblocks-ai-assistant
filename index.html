@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dblocks Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+    <div id="app-container">
+        <!-- Prototype Background representing Dblocks -->
+        <div class="mock-bg">
+            <div class="parallax-shape shape-1"></div>
+            <div class="parallax-shape shape-2"></div>
+            <div class="parallax-shape shape-3"></div>
+            <img src="logo.png" alt="Dblocks Logo" class="logo-placeholder">
+            <div class="canvas-placeholder">Use os blocos para criar circuitos...</div>
+
+            <!-- Informações para o Desenvolvedor (Fora do Chat) -->
+            <div class="dev-info-container">
+                <div class="dev-info-card">
+                    <h2><i class="bi bi-code-square"></i> Informações para o Desenvolvedor</h2>
+                    <div class="dev-alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span><strong>Limite de Voz:</strong> O áudio renova mensalmente (Conta Gratuita ElevenLabs). Se
+                            parar de funcionar, aguarde o reset do mês.</span>
+                    </div>
+                    <div class="dev-summary">
+                        <p>🧩 <strong>Dblocks Assistant:</strong> Uso blocos para criar circuitos de forma intuitiva.
+                        </p>
+                        <p>🎙️ <strong>Tecnologia:</strong> Speech-to-Text (Browser) + Text-to-Speech (ElevenLabs Flash
+                            v2.5).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assistant Widget -->
+        <div id="voice-assistant" class="assistant-collapsed">
+            <div class="assistant-content">
+                <div class="assistant-header">
+                    <img src="logo.png" alt="Dblocks Logo" class="assistant-logo">
+                    <div class="header-info">
+                        <h3>Dblocks AI</h3>
+                        <span>Assistente Virtual</span>
+                    </div>
+                    <div class="header-actions">
+                        <div class="voice-selector-container">
+                            <button id="voice-selector-btn" title="Mudar Voz"><i
+                                    class="bi bi-person-badge-fill"></i></button>
+                            <div id="voice-menu" class="voice-menu">
+                                <!-- Opções de vozes serão injetadas via JS -->
+                            </div>
+                        </div>
+                        <button id="info-btn" title="Informações"><i class="bi bi-info-circle"></i></button>
+                        <button id="close-chat"><i class="bi bi-dash"></i></button>
+                    </div>
+                </div>
+
+                <div id="chat-messages" class="chat-messages">
+                    <!-- Banner de Créditos (Sempre Visível) -->
+                    <div id="credit-notice-middle" class="credit-banner">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <span><strong>Aviso:</strong> Créditos de áudio renovam mensalmente.</span>
+                    </div>
+
+                    <!-- Novo Banner de Circuitos -->
+                    <div class="credit-banner circuit-banner">
+                        <i class="bi bi-cpu-fill"></i>
+                        <span>Uso blocos para criar circuitos.</span>
+                    </div>
+
+                    <div class="message bot">
+                        <div class="avatar"><i class="bi bi-robot"></i></div>
+                        <div class="bubble clickable-speech">Olá! Sou o assistente da Dblocks. Uso blocos para criar
+                            circuitos! Como posso te ajudar a
+                            criar seu projeto
+                            hoje? <i class="bi bi-mic-fill playback-cue"></i></div>
+                    </div>
+                </div>
+
+                <div class="assistant-footer">
+                    <div class="input-container">
+                        <input type="text" id="user-input" placeholder="Pergunte algo... (Clique no 🎤 para ouvir)">
+                        <div id="recording-feedback" class="recording-feedback">
+                            <span class="timer">00:00</span>
+                            <div class="wave-animation">
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                            </div>
+                            <span style="font-size: 12px; color: #999;">Gravando...</span>
+                        </div>
+                        <button id="voice-btn" class="glow-effect"><i class="bi bi-mic-fill"></i></button>
+                    </div>
+                    <button id="send-btn"><i class="bi bi-send-fill"></i></button>
+                </div>
+
+                <!-- Fly-out Help Panel (Dentro do Chat) -->
+                <div id="info-modal" class="info-panel">
+                    <div class="info-panel-header">
+                        <h3>Guia de Ajuda</h3>
+                        <button id="close-info" class="close-info-btn">&times;</button>
+                    </div>
+                    <div class="info-panel-body">
+                        <div id="quota-display" class="quota-display-container">
+                            <p>Buscando saldo de caracteres...</p>
+                        </div>
+                        <div class="readme-preview">
+                            <h3>O que eu faço?</h3>
+                            <ul>
+                                <li>🎙️ <strong>Voz WhatsApp</strong>: Segure o microfone para perguntar algo.</li>
+                                <li>🧩 <strong>Circuitos</strong>: Eu te ensino a usar blocos para criar circuitos!</li>
+                                <li>💾 <strong>Histórico</strong>: Suas conversas ficam salvas aqui mesmo.</li>
+                            </ul>
+                            <h3>Configurações</h3>
+                            <p>Escolha sua voz favorita no ícone de perfil no topo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Launcher Button (Bottom Left) -->
+            <button id="assistant-launcher" class="launcher-btn">
+                <div class="logo-icon"><i class="bi bi-robot"></i></div>
+                <div class="pulse-ring"></div>
+            </button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>

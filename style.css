@@ -757,46 +757,160 @@ input#user-input {
 
 .verify-btn:active {
     transform: scale(0.95);
-}/* --- Mobile Responsiveness (Xiaomi Note 12 and others) --- */
+}
+
+/* --- Mobile Responsiveness (Xiaomi Note 12 and others) --- */
 @media screen and (max-width: 768px) {
 
     /* Reposition Launcher to Bottom Right comfortably */
     #voice-assistant {
-        bottom: 20px;
-        right: 20px;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    /* Launcher Button smaller on mobile */
+    .launcher-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 28px;
     }
 
     /* Assistant Content: Full Screen on Mobile */
     .assistant-content {
         position: fixed;
-        bottom: 0;
+        top: 0;
+        left: 0;
         right: 0;
-        width: 100vw;
-        height: 100vh;
-        /* Fullscreen logic */
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        max-width: 100vw;
         max-height: 100vh;
+        max-height: -webkit-fill-available;
+        /* iOS Safari fix */
         border-radius: 0;
         border: none;
         transform-origin: bottom center;
-        background: rgba(0, 8, 16, 0.98);
-        /* Slightly darker for better readability */
+        background: rgba(0, 8, 16, 1);
+        display: flex;
+        flex-direction: column;
     }
 
     /* Adjust animation for fullscreen */
     .assistant-content {
-        transform: scale(0.9) translateY(100%);
-        /* Slide up from bottom */
+        transform: translateY(100%);
+        opacity: 0;
     }
 
     .assistant-expanded .assistant-content {
-        transform: scale(1) translateY(0);
+        transform: translateY(0);
+        opacity: 1;
     }
 
     /* Adjust Header for Mobile */
     .assistant-header {
-        padding: 15px;
-        padding-top: max(15px, env(safe-area-inset-top));
-        /* Notch support */
+        padding: 12px 15px;
+        padding-top: max(12px, env(safe-area-inset-top));
+        flex-shrink: 0;
+        min-height: 60px;
+    }
+
+    .assistant-logo {
+        height: 28px;
+    }
+
+    .header-info h3 {
+        font-size: 14px;
+    }
+
+    .header-info span {
+        font-size: 11px;
+    }
+
+    .lang-switch {
+        margin-right: 5px;
+    }
+
+    .lang-btn {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    /* Chat Messages - Take available space */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+        padding-bottom: 10px;
+        min-height: 0;
+        /* Important for flex shrinking */
+    }
+
+    /* Message bubbles */
+    .message {
+        max-width: 90%;
+    }
+
+    .bubble {
+        padding: 10px 14px;
+        font-size: 14px;
+        line-height: 1.4;
+        max-width: 100%;
+        word-break: break-word;
+    }
+
+    .avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    /* Footer - Fixed at bottom with safe area */
+    .assistant-footer {
+        flex-shrink: 0;
+        padding: 10px 12px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        background: rgba(0, 15, 30, 1);
+        border-top: 1px solid var(--glass-border);
+        position: relative;
+        z-index: 10;
+    }
+
+    .input-container {
+        flex: 1;
+    }
+
+    input#user-input {
+        padding: 10px 40px 10px 14px;
+        font-size: 16px;
+        /* Prevents iOS zoom */
+        border-radius: 22px;
+    }
+
+    #voice-btn {
+        font-size: 20px;
+        right: 8px;
+    }
+
+    #send-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    /* Recording feedback */
+    .recording-feedback {
+        left: 2px;
+        right: 38px;
+        padding: 0 10px;
+    }
+
+    /* Playback cue */
+    .playback-cue {
+        font-size: 14px;
+        margin-left: 6px;
     }
 
     /* Hide Launcher check when expanded (optional, but cleaner) */
@@ -841,6 +955,7 @@ input#user-input {
         transform: translateX(-50%) translateY(0);
     }
 }
+
 /* --- Tablet Responsiveness (iPad, Galaxy Tab, etc.) --- */
 @media screen and (min-width: 769px) and (max-width: 1024px) {
     #voice-assistant {

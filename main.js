@@ -544,54 +544,59 @@ function stopRecording() {
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true; // Importante para ver o texto enquanto fala
-    recognition.lang = 'pt-BR';
+    recognition.continuous = false; // Alterado para false para evitar duplicação
+    recognition.interimResults = true; // Mostra texto enquanto fala
+    recognition.lang = currentLang === 'pt' ? 'pt-BR' : 'en-US';
 
     recognition.onresult = (event) => {
+        // Reconstruir transcrição completa a cada evento para evitar duplicação
+        let finalTranscript = "";
         let interimTranscript = "";
-        let finalForThisResult = "";
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+        // Percorrer TODOS os resultados desde o início
+        for (let i = 0; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-                finalForThisResult += transcript;
+                finalTranscript += transcript;
             } else {
                 interimTranscript += transcript;
             }
         }
 
-        if (finalForThisResult) {
-            accumulatedTranscript += finalForThisResult;
-        }
-
-        // Mostra o que está sendo falado no campo de texto para feedback
-        userInput.value = accumulatedTranscript + interimTranscript;
-        console.log("Transcrição ao vivo:", userInput.value);
+        // Atualizar campo de texto com transcrição limpa
+        userInput.value = (finalTranscript + interimTranscript).trim();
+        console.log("Transcrição:", userInput.value);
     };
 
     recognition.onend = () => {
         const finalMessage = userInput.value.trim();
         console.log("Reconhecimento finalizado. Conteúdo:", finalMessage);
 
-        if (finalMessage) {
+        // Só envia se estávamos gravando (não se parou por erro)
+        if (finalMessage && !isRecording) {
             addMessage(finalMessage, 'user');
             generateResponse(finalMessage);
-            userInput.value = ""; // Limpa após enviar
-            accumulatedTranscript = "";
-        } else {
+            userInput.value = "";
+        } else if (!finalMessage) {
             console.warn("Nenhum texto detectado.");
         }
+
+        // Limpar estado
+        accumulatedTranscript = "";
     };
 
     recognition.onstart = () => {
         console.log("Reconhecimento iniciado");
+        accumulatedTranscript = "";
+        userInput.value = "";
     };
 
     recognition.onerror = (event) => {
         console.error("Erro Recognition:", event.error);
         if (event.error === 'not-allowed') {
             alert("Permissão de microfone negada pelo navegador.");
+        } else if (event.error === 'no-speech') {
+            console.warn("Nenhuma fala detectada.");
         }
         stopRecording();
     };

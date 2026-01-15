@@ -841,3 +841,53 @@ input#user-input {
         transform: translateX(-50%) translateY(0);
     }
 }
+/* --- Tablet Responsiveness (iPad, Galaxy Tab, etc.) --- */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    #voice-assistant {
+        bottom: 30px;
+        right: 30px;
+    }
+
+    .assistant-content {
+        width: 450px;
+        /* Slightly wider than desktop default */
+        height: 700px;
+        /* Taller */
+        max-height: 80vh;
+    }
+
+    .launcher-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 36px;
+    }
+}
+
+/* --- Mobile Landscape & Small Screens refinement --- */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .assistant-content {
+        height: 100vh;
+        width: 100vw;
+        flex-direction: row;
+        /* Side-by-side for landscape? Or just compact */
+    }
+
+    .chat-messages {
+        flex: 1;
+    }
+
+    .assistant-header {
+        padding: 10px;
+    }
+}
+
+/* Ensure inputs don't zoom on mobile iOS */
+@media screen and (max-width: 768px) {
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+        font-size: 16px;
+        /* Prevents auto-zoom */
+    }
+}
